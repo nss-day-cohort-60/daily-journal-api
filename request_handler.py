@@ -79,8 +79,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
-        """docstring"""
-        self._set_headers(201)
+        """ posts new data to the database """
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -90,31 +89,28 @@ class HandleRequests(BaseHTTPRequestHandler):
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Initialize new animal
-        new_snake = None
-        new_owner = None
-        new_species = None
-        # Add a new animal to the list. Don't worry about
-        # the orange squiggle, you'll define the create_animal
-        # function next.
+        # Initialize new data. this represents the post you want to make
+        new_data = None
+
+        # check the resource the user is trying to access.
+        # pass the post body into the create function.
+        # set new_data equal to the function's response.
         if resource == "snakes":
-            new_snake = create_snake(post_body)
+            self._set_headers(201)
+            new_data = create_snake(post_body)
+        elif resource == "owners":
+            self._set_headers(201)
+            new_data = create_owner(post_body)
+        elif resource == "tags":
+            self._set_headers(201)
+            new_data = create_tag(post_body)
 
-        if resource == "owners":
-            new_owner = create_owner(post_body)
-
-        if resource == "tags":
-            new_species = create_tag(post_body)
-
-        if resource != 'snakes' or 'owners' or 'species':
+        elif resource != 'snakes' or 'owners' or 'species':
             self._set_headers(404)
 
-        # Encode the new animal and send in response
-            self.wfile.write(json.dumps(new_snake).encode())
+        # Encode the new data and send in response
+            self.wfile.write(json.dumps(new_data).encode())
 
-            self.wfile.write(json.dumps(new_owner).encode())
-
-            self.wfile.write(json.dumps(new_species).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
