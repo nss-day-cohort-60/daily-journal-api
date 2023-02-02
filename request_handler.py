@@ -2,28 +2,25 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import get_all_species, get_all_snakes, get_snakes_by_species
-from views import get_single_species, get_single_snake
-from views import get_all_owners, get_single_owner
-from views import create_species, create_owner, create_snake
+from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
     def parse_url(self, path):
-            """Parse the url into the resource and id"""
-            parsed_url = urlparse(path)
-            path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
-            resource = path_params[1]
-            if parsed_url.query:
-                query = parse_qs(parsed_url.query)
-                return (resource, query)
-            pk = None
-            try:
-                pk = int(path_params[2])
-            except (IndexError, ValueError):
-                pass
-            return (resource, pk)
+        """Parse the url into the resource and id"""
+        parsed_url = urlparse(path)
+        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+        resource = path_params[1]
+        if parsed_url.query:
+            query = parse_qs(parsed_url.query)
+            return (resource, query)
+        pk = None
+        try:
+            pk = int(path_params[2])
+        except (IndexError, ValueError):
+            pass
+        return (resource, pk)
     # def parse_url(self, path):
     #     """notes"""
     #     # Just like splitting a string in JavaScript. If the
@@ -182,9 +179,11 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        # success = False
+
     # Delete a single animal from the list
-        if resource == "metals":
-            update_metal(id, post_body)
+        if resource == "users":
+            update_user(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
