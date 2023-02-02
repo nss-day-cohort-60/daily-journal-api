@@ -2,11 +2,6 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import get_all_species, get_all_snakes, get_snakes_by_species
-from views import get_single_species, get_single_snake
-from views import get_all_owners, get_single_owner
-
-#create functions
 from views import create_tag
 
 class HandleRequests(BaseHTTPRequestHandler):
