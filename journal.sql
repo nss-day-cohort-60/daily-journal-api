@@ -65,3 +65,5 @@ INSERT INTO `Entry_Tags` VALUES (null, 2, 2);
 INSERT INTO `Entry_Tags` VALUES (null, 3, 3);
 INSERT INTO `Entry_Tags` VALUES (null, 4, 4);
 INSERT INTO `Entry_Tags` VALUES (null, 5, 5);
+
+DROP TABLE Users 
