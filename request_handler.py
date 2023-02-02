@@ -2,6 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+from views import get_single_entry, get_all_entries
 from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -21,26 +22,6 @@ class HandleRequests(BaseHTTPRequestHandler):
         except (IndexError, ValueError):
             pass
         return (resource, pk)
-    # def parse_url(self, path):
-    #     """notes"""
-    #     # Just like splitting a string in JavaScript. If the
-    #     # path is "/animals/1", the resulting list will
-    #     # have "" at index 0, "animals" at index 1, and "1"
-    #     # at index 2.
-    #     resource = path_params[1]
-    #     path_params = path.split("/")
-
-    #     # Try to get the item at index 2
-    #     try:
-    #         # Convert the string "1" to the integer 1
-    #         # This is the new parseInt()
-    #         id = int(path_params[2])
-    #     except IndexError:
-    #         pass  # No route parameter exists: /animals
-    #     except ValueError:
-    #         pass  # Request had trailing slash: /animals/
-
-    #     return (resource, id)  # This is a tuple
 
     def do_GET(self):
         """Handles GET requests to the server """
@@ -49,13 +30,13 @@ class HandleRequests(BaseHTTPRequestHandler):
         if '?' not in self.path:
             (resource, id) = parsed
 
-            if resource == "species":
-                if id is not None and id < len(get_all_species()):
+            if resource == "entries":
+                if id is not None and id < len(get_all_entries()):
                     self._set_headers(200)
-                    response = get_single_species(id)
+                    response = get_single_entry(id)
                 elif id is None:
                     self._set_headers(200)
-                    response = get_all_species()
+                    response = get_all_entries()
                 else:
                     self._set_headers(404)
 
