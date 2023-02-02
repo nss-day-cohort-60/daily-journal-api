@@ -2,6 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+from views import get_all_moods
 from views import get_single_entry, get_all_entries
 from views import update_user
 
@@ -30,6 +31,13 @@ class HandleRequests(BaseHTTPRequestHandler):
         if '?' not in self.path:
             (resource, id) = parsed
 
+            if resource == "moods":
+                if id is not None and id < len(get_all_moods()):
+                    self._set_headers(200)
+                    response = get_single_mood(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_moods()
             if resource == "entries":
                 if id is not None and id < len(get_all_entries()):
                     self._set_headers(200)
@@ -39,38 +47,6 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
-
-            elif resource == "snakes":
-                if id is not None and id < len(get_all_snakes()):
-                    snake = get_single_snake(id)
-                    if snake['species']['name'] == "Aonyx cinerea":
-                        self._set_headers(405)
-                    else:
-                        self._set_headers(200)
-                        response = snake
-                elif id is None:
-                    self._set_headers(200)
-                    response = get_all_snakes()
-                else:
-                    self._set_headers(404)
-
-            elif resource == "owners":
-                if id is not None:
-                    self._set_headers(200)
-                    response = get_single_owner(id)
-                elif id is None:
-                    self._set_headers(200)
-                    response = get_all_owners()
-                else:
-                    self._set_headers(404)
-            else:
-                self._set_headers(404)
-        else:
-            self._set_headers(200)
-            (resource, query) = parsed
-
-            if query.get('species_id') and resource == 'snakes':
-                response = get_snakes_by_species(query['species_id'][0])
 
         self.wfile.write(json.dumps(response).encode())
 
