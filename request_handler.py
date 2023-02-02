@@ -2,6 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
 from views import get_single_entry, get_all_entries
 from views import update_user
@@ -58,35 +59,11 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         # Convert JSON string to a Python dictionary
         post_body = json.loads(post_body)
-
+        response = []
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Initialize new animal
-        new_snake = None
-        new_owner = None
-        new_species = None
-        # Add a new animal to the list. Don't worry about
-        # the orange squiggle, you'll define the create_animal
-        # function next.
-        if resource == "snakes":
-            new_snake = create_snake(post_body)
-
-        if resource == "owners":
-            new_owner = create_owner(post_body)
-
-        if resource == "species":
-            new_species = create_species(post_body)
-
-        if resource != 'snakes' or 'owners' or 'species':
-            self._set_headers(404)
-
-        # Encode the new animal and send in response
-            self.wfile.write(json.dumps(new_snake).encode())
-
-            self.wfile.write(json.dumps(new_owner).encode())
-
-            self.wfile.write(json.dumps(new_species).encode())
+        self.wfile.write(json.dumps(response).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
@@ -120,8 +97,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
     # Delete a single animal from the list
-        if resource == "orders":
-            delete_order(id)
+        if resource == "entries":
+            delete_entry(id)
+            delete_entry_tag_with_entryid(id)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
