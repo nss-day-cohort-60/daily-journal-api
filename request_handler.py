@@ -2,6 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
 from views import get_single_entry, get_all_entries
@@ -57,13 +58,19 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
-        # Convert JSON string to a Python dictionary
         post_body = json.loads(post_body)
-        response = []
-        # Parse the URL
+
         (resource, id) = self.parse_url(self.path)
 
-        self.wfile.write(json.dumps(response).encode())
+        new_data = None
+
+        if resource == "entry":
+            new_data = create_entry(post_body)
+
+        if resource != 'entry':
+            self._set_headers(404)
+
+            self.wfile.write(json.dumps(new_data).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
