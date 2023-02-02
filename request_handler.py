@@ -2,6 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
+from views import create_tag
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
@@ -53,8 +54,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
-        """docstring"""
-        self._set_headers(201)
+        """ posts new data to the database """
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -66,8 +66,11 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         if resource == "entry":
             new_data = create_entry(post_body)
+        elif resource == "tags":
+            self._set_headers(201)
+            new_data = create_tag(post_body)
 
-        if resource != 'entry':
+        if resource != 'entry' or 'tags':
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())

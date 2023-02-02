@@ -1,3 +1,4 @@
+from .tags_requests import create_tag
 from .entries_requests import create_entry
 from .entries_requests import delete_entry
 from .entry_tags_requests import delete_entry_tag_with_entryid
