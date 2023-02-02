@@ -2,10 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import get_all_species, get_all_snakes, get_snakes_by_species
-from views import get_single_species, get_single_snake
-from views import get_all_owners, get_single_owner
-from views import create_species, create_owner, create_snake
+from views import create_entry
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -24,26 +21,6 @@ class HandleRequests(BaseHTTPRequestHandler):
             except (IndexError, ValueError):
                 pass
             return (resource, pk)
-    # def parse_url(self, path):
-    #     """notes"""
-    #     # Just like splitting a string in JavaScript. If the
-    #     # path is "/animals/1", the resulting list will
-    #     # have "" at index 0, "animals" at index 1, and "1"
-    #     # at index 2.
-    #     resource = path_params[1]
-    #     path_params = path.split("/")
-
-    #     # Try to get the item at index 2
-    #     try:
-    #         # Convert the string "1" to the integer 1
-    #         # This is the new parseInt()
-    #         id = int(path_params[2])
-    #     except IndexError:
-    #         pass  # No route parameter exists: /animals
-    #     except ValueError:
-    #         pass  # Request had trailing slash: /animals/
-
-    #     return (resource, id)  # This is a tuple
 
     def do_GET(self):
         """Handles GET requests to the server """
@@ -51,48 +28,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         if '?' not in self.path:
             (resource, id) = parsed
-
-            if resource == "species":
-                if id is not None and id < len(get_all_species()):
-                    self._set_headers(200)
-                    response = get_single_species(id)
-                elif id is None:
-                    self._set_headers(200)
-                    response = get_all_species()
-                else:
-                    self._set_headers(404)
-
-            elif resource == "snakes":
-                if id is not None and id < len(get_all_snakes()):
-                    snake = get_single_snake(id)
-                    if snake['species']['name'] == "Aonyx cinerea":
-                        self._set_headers(405)
-                    else:
-                        self._set_headers(200)
-                        response = snake
-                elif id is None:
-                    self._set_headers(200)
-                    response = get_all_snakes()
-                else:
-                    self._set_headers(404)
-
-            elif resource == "owners":
-                if id is not None:
-                    self._set_headers(200)
-                    response = get_single_owner(id)
-                elif id is None:
-                    self._set_headers(200)
-                    response = get_all_owners()
-                else:
-                    self._set_headers(404)
-            else:
-                self._set_headers(404)
-        else:
-            self._set_headers(200)
-            (resource, query) = parsed
-
-            if query.get('species_id') and resource == 'snakes':
-                response = get_snakes_by_species(query['species_id'][0])
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -102,37 +37,19 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
-        # Convert JSON string to a Python dictionary
         post_body = json.loads(post_body)
 
-        # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
-        # Initialize new animal
-        new_snake = None
-        new_owner = None
-        new_species = None
-        # Add a new animal to the list. Don't worry about
-        # the orange squiggle, you'll define the create_animal
-        # function next.
-        if resource == "snakes":
-            new_snake = create_snake(post_body)
+        new_entry = None
 
-        if resource == "owners":
-            new_owner = create_owner(post_body)
+        if resource == "entry":
+            new_entry = create_entry(post_body)
 
-        if resource == "species":
-            new_species = create_species(post_body)
-
-        if resource != 'snakes' or 'owners' or 'species':
+        if resource != 'entry':
             self._set_headers(404)
 
-        # Encode the new animal and send in response
-            self.wfile.write(json.dumps(new_snake).encode())
-
-            self.wfile.write(json.dumps(new_owner).encode())
-
-            self.wfile.write(json.dumps(new_species).encode())
+            self.wfile.write(json.dumps(new_entry).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
