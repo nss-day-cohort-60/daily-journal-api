@@ -3,6 +3,9 @@ import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import delete_entry, delete_entry_tag_with_entryid
+from views import get_all_moods
+from views import get_single_entry, get_all_entries
+from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -15,9 +18,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         if parsed_url.query:
             query = parse_qs(parsed_url.query)
             return (resource, query)
-            pk = None
+        pk = None
         try:
-                pk = int(path_params[2])
+            pk = int(path_params[2])
         except (IndexError, ValueError):
             pass
         return (resource, pk)
@@ -28,6 +31,23 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         if '?' not in self.path:
             (resource, id) = parsed
+
+            if resource == "moods":
+                if id is not None and id < len(get_all_moods()):
+                    self._set_headers(200)
+                    response = get_single_mood(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_moods()
+            if resource == "entries":
+                if id is not None and id < len(get_all_entries()):
+                    self._set_headers(200)
+                    response = get_single_entry(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_entries()
+                else:
+                    self._set_headers(404)
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -94,6 +114,11 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        # success = False
+
+    # Delete a single animal from the list
+        if resource == "users":
+            update_user(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
