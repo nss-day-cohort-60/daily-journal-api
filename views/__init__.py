@@ -1,0 +1,2 @@
+from .entries_requests import delete_entry
+from .entry_tags_requests import delete_entry_tag_with_entryid
