@@ -3,6 +3,7 @@ import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import get_single_entry, get_all_entries
+from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -10,7 +11,7 @@ class HandleRequests(BaseHTTPRequestHandler):
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')
+        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
         resource = path_params[1]
         if parsed_url.query:
             query = parse_qs(parsed_url.query)
@@ -159,9 +160,11 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        # success = False
+
     # Delete a single animal from the list
-        if resource == "metals":
-            update_metal(id, post_body)
+        if resource == "users":
+            update_user(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
