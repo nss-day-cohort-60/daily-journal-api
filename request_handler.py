@@ -3,24 +3,28 @@ import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import create_entry
+from views import delete_entry, delete_entry_tag_with_entryid
+from views import get_all_moods
+from views import get_single_entry, get_all_entries
+from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
     """
     def parse_url(self, path):
-            """Parse the url into the resource and id"""
-            parsed_url = urlparse(path)
-            path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
-            resource = path_params[1]
-            if parsed_url.query:
-                query = parse_qs(parsed_url.query)
-                return (resource, query)
-            pk = None
-            try:
-                pk = int(path_params[2])
-            except (IndexError, ValueError):
-                pass
-            return (resource, pk)
+        """Parse the url into the resource and id"""
+        parsed_url = urlparse(path)
+        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+        resource = path_params[1]
+        if parsed_url.query:
+            query = parse_qs(parsed_url.query)
+            return (resource, query)
+        pk = None
+        try:
+            pk = int(path_params[2])
+        except (IndexError, ValueError):
+            pass
+        return (resource, pk)
 
     def do_GET(self):
         """Handles GET requests to the server """
@@ -28,6 +32,23 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         if '?' not in self.path:
             (resource, id) = parsed
+
+            if resource == "moods":
+                if id is not None and id < len(get_all_moods()):
+                    self._set_headers(200)
+                    response = get_single_mood(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_moods()
+            if resource == "entries":
+                if id is not None and id < len(get_all_entries()):
+                    self._set_headers(200)
+                    response = get_single_entry(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_entries()
+                else:
+                    self._set_headers(404)
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -41,15 +62,15 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         (resource, id) = self.parse_url(self.path)
 
-        new_entry = None
+        new_data = None
 
         if resource == "entry":
-            new_entry = create_entry(post_body)
+            new_data = create_entry(post_body)
 
         if resource != 'entry':
             self._set_headers(404)
 
-            self.wfile.write(json.dumps(new_entry).encode())
+            self.wfile.write(json.dumps(new_data).encode())
 
     def _set_headers(self, status):
         """Sets the status code, Content-Type and Access-Control-Allow-Origin
@@ -83,8 +104,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
     # Delete a single animal from the list
-        if resource == "orders":
-            delete_order(id)
+        if resource == "entries":
+            delete_entry(id)
+            delete_entry_tag_with_entryid(id)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
@@ -99,9 +121,11 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
 
+        # success = False
+
     # Delete a single animal from the list
-        if resource == "metals":
-            update_metal(id, post_body)
+        if resource == "users":
+            update_user(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
