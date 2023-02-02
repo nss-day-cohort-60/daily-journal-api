@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Tag 
+from models import Tags
 
 def create_tag(new_tag):
     """ creates a new tag and adds it to the database """
