@@ -65,12 +65,12 @@ class HandleRequests(BaseHTTPRequestHandler):
         new_data = None
 
         if resource == "entries":
+            self._set_headers(201)
             new_data = create_entry(post_body)
         elif resource == "tags":
             self._set_headers(201)
             new_data = create_tag(post_body)
-
-        if resource != 'entries' or 'tags':
+        elif resource is not 'entries' or 'tags':
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())
