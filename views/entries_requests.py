@@ -105,11 +105,10 @@ def update_entry(id, new_entry):
         db_cursor.execute("""
         UPDATE Entries
             SET
-                id = ?,
-                timestamp = ?
-                concepts = ?
-                journal_entry = ?
-                user_id = ?
+                timestamp = ?,
+                concepts = ?,
+                journal_entry = ?,
+                user_id = ?,
                 mood_id = ?
         WHERE id = ?
         """, (new_entry['timestamp'], new_entry['concepts'], new_entry['journal_entry'], new_entry['user_id'], new_entry['mood_id'], id, ))
