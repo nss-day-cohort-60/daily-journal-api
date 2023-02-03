@@ -125,6 +125,8 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # success = False
+        ##
+        #
 
     # Delete a single animal from the list
         if resource == "users":
