@@ -54,7 +54,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     def do_POST(self):
         """docstring"""
-        self._set_headers(201)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
 
@@ -64,10 +63,11 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         new_data = None
 
-        if resource == "entry":
+        if resource == "entries":
+            self._set_headers(201)
             new_data = create_entry(post_body)
 
-        if resource != 'entry':
+        if resource != 'entries':
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())
