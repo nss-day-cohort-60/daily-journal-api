@@ -10,3 +10,4 @@ def delete_entry_tag_with_entryid(entry_id):
         DELETE FROM Entry_Tags
         WHERE id = ?
         """, (entry_id, ))
+        

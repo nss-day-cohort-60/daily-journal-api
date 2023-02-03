@@ -2,7 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import create_tag
+from views import create_tag, create_user
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
@@ -70,6 +70,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         elif resource == "tags":
             self._set_headers(201)
             new_data = create_tag(post_body)
+        elif resource == "users":
+            self._set_headers(201)
+            new_data = create_user(post_body)
         elif resource is not 'entries' or 'tags':
             self._set_headers(404)
 
@@ -93,9 +96,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods',
-                         'GET, POST, PUT, DELETE')
+                        'GET, POST, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers',
-                         'X-Requested-With, Content-Type, Accept')
+                        'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
     def do_DELETE(self):

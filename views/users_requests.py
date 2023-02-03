@@ -22,3 +22,19 @@ def update_user(id, new_user):
     else:
         # Forces 204 response by main module
         return True
+
+def create_user(new_user):
+    """ sydney's here? hi sydney! """
+    with sqlite3.connect("./journal.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        INSERT INTO Users
+            (name, email)
+        VALUES
+            (?, ?)
+        """, (new_user['name'],new_user['email']))
+
+        id = db_cursor.lastrowid
+        new_user['id'] = id
+    return new_user
