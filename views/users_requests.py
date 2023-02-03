@@ -33,8 +33,9 @@ def create_user(new_user):
             (name, email)
         VALUES
             (?, ?)
-        """, (new_user['name'],new_user['email']))
+        """, (new_user['name'],new_user['email'],))
 
         id = db_cursor.lastrowid
         new_user['id'] = id
     return new_user
+    
