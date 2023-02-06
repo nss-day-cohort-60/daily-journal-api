@@ -70,25 +70,4 @@ def delete_entry_tag_with_entryid(entry_id):
         DELETE FROM Entry_Tags
         WHERE id = ?
         """, (entry_id, ))
-
-def create_entry_tag(new_entry_tag):
-    """Returns new dictionary with id property added"""
-    with sqlite3.connect("./journal.sqlite3") as conn:
-        db_cursor = conn.cursor()
-
-        db_cursor.execute("""
-        INSERT INTO Entry_Tags
-            ( entry_id, tag_id)
-        SELECT e.id, t.id
-        FROM entry_tags et
-        JOIN tags t
-            ON t.id = et.id 
-        VALUES
-            ( ?, ?);
-        """, (new_entry_tag['entry_id'], new_entry_tag['tag_id']))
-
-        id = db_cursor.lastrowid
-
-        new_entry_tag['id'] = id
-
-    return new_entry_tag
+        

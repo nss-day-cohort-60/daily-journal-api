@@ -2,12 +2,18 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import create_tag
+from views import create_tag, create_user
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
+<<<<<<< HEAD
 from views import get_all_moods
 from views import get_single_entry, get_all_entries, get_all_entry_tags
 from views import update_user
+=======
+from views import get_all_moods, get_single_mood
+from views import get_single_entry, get_all_entries, search_journal_entries
+from views import update_user, update_entry
+>>>>>>> main
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -15,7 +21,7 @@ class HandleRequests(BaseHTTPRequestHandler):
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+        path_params = parsed_url.path.split('/')
         resource = path_params[1]
         if parsed_url.query:
             query = parse_qs(parsed_url.query)
@@ -41,7 +47,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 elif id is None:
                     self._set_headers(200)
                     response = get_all_moods()
-            if resource == "entries":
+            elif resource == "entries":
                 if id is not None and id < len(get_all_entries()):
                     self._set_headers(200)
                     response = get_single_entry(id)
@@ -50,10 +56,25 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
+<<<<<<< HEAD
             if resource == "entry_tags":
                 self._set_headers(200)
                 response = get_all_entry_tags()
             self.wfile.write(json.dumps(response).encode())
+=======
+        else:
+            (resource) = parsed
+            if resource == "entries_search":
+                if "q" in parsed[1]:
+                    search_term = parsed[1]["q"][0]
+                    self._set_headers(200)
+                    response = search_journal_entries(search_term)
+                else:
+                    self._set_headers(400)
+                    response = {"error": "missing search term"}
+
+        self.wfile.write(json.dumps(response).encode())
+>>>>>>> main
 
     def do_POST(self):
         """ posts new data to the database """
@@ -73,6 +94,9 @@ class HandleRequests(BaseHTTPRequestHandler):
             self._set_headers(201)
             new_data = create_tag(post_body)
 
+        elif resource == "users":
+            self._set_headers(201)
+            new_data = create_user(post_body)
         elif resource is not 'entries' or 'tags':
             self._set_headers(404)
 
@@ -96,9 +120,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods',
-                         'GET, POST, PUT, DELETE')
+                        'GET, POST, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers',
-                         'X-Requested-With, Content-Type, Accept')
+                        'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
     def do_DELETE(self):
@@ -128,10 +152,14 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # success = False
+        ##
+        #
 
     # Delete a single animal from the list
         if resource == "users":
             update_user(id, post_body)
+        if resource == "entries":
+            update_entry(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
