@@ -64,6 +64,9 @@ INSERT INTO `Entry_Tags` VALUES (null, 1, 1);
 INSERT INTO `Entry_Tags` VALUES (null, 2, 2);
 INSERT INTO `Entry_Tags` VALUES (null, 3, 3);
 INSERT INTO `Entry_Tags` VALUES (null, 4, 4);
+<<<<<<< HEAD
+INSERT INTO `Entry_Tags` VALUES (null, 5, 5);
+=======
 INSERT INTO `Entry_Tags` VALUES (null, 5, 5);
 
 DROP TABLE Users 
@@ -85,3 +88,4 @@ SELECT
             ON e.id = et.entry_id
         JOIN Tags t 
             ON t.id = et.tag_id
+>>>>>>> main
