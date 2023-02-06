@@ -97,3 +97,22 @@ def get_single_entry(id):
         data['journal_entry'], data['user_id'], data['mood_id'])
 
     return entry.__dict__
+
+
+
+def search_journal_entries(search_term):
+    """docstring"""
+    with sqlite3.connect("./journal.sqlite3") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        query = """SELECT * FROM entries WHERE journal_entry LIKE ?"""
+
+        db_cursor.execute (query, ('%' + search_term + '%',))
+        entries=[]
+        data = db_cursor.fetchall()
+        for row in data:
+            entry = Entries(row['id'], row['timestamp'], row['concepts'], row['journal_entry'], row['user_id'], row['mood_id'])
+            entries.append(entry.__dict__)
+
+    return entries
