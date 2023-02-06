@@ -2,12 +2,10 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import create_tag
-from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
 from views import get_single_entry, get_all_entries
-from views import update_user
+from views import update_user, create_entry_tag
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -64,13 +62,11 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         new_data = None
 
-        if resource == "entry":
-            new_data = create_entry(post_body)
-        elif resource == "tags":
+        if resource == "entry_tag":
             self._set_headers(201)
-            new_data = create_tag(post_body)
+            new_data = create_entry_tag(post_body)
 
-        if resource != 'entry' or 'tags':
+        if resource is not "entry_tag":
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())
