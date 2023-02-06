@@ -5,8 +5,8 @@ from urllib.parse import urlparse, parse_qs
 from views import create_tag
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
-from views import get_all_moods
-from views import get_single_entry, get_all_entries
+from views import get_all_moods, get_single_mood
+from views import get_single_entry, get_all_entries, search_journal_entries
 from views import update_user, update_entry
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -15,7 +15,7 @@ class HandleRequests(BaseHTTPRequestHandler):
     def parse_url(self, path):
         """Parse the url into the resource and id"""
         parsed_url = urlparse(path)
-        path_params = parsed_url.path.split('/')  # ['', 'animals', 1]
+        path_params = parsed_url.path.split('/')
         resource = path_params[1]
         if parsed_url.query:
             query = parse_qs(parsed_url.query)
@@ -41,7 +41,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 elif id is None:
                     self._set_headers(200)
                     response = get_all_moods()
-            if resource == "entries":
+            elif resource == "entries":
                 if id is not None and id < len(get_all_entries()):
                     self._set_headers(200)
                     response = get_single_entry(id)
@@ -50,6 +50,16 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
+        else:
+            (resource) = parsed
+            if resource == "entries_search":
+                if "q" in parsed[1]:
+                    search_term = parsed[1]["q"][0]
+                    self._set_headers(200)
+                    response = search_journal_entries(search_term)
+                else:
+                    self._set_headers(400)
+                    response = {"error": "missing search term"}
 
         self.wfile.write(json.dumps(response).encode())
 
@@ -93,9 +103,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods',
-                         'GET, POST, PUT, DELETE')
+                        'GET, POST, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers',
-                         'X-Requested-With, Content-Type, Accept')
+                        'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
     def do_DELETE(self):
