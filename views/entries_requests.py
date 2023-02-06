@@ -93,7 +93,7 @@ def get_single_entry(id):
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
-        entry = Entries(data['id'], data['timestamp'], data['concepts'], 
+        entry = Entries(data['id'], data['timestamp'], data['concepts'],
         data['journal_entry'], data['user_id'], data['mood_id'])
 
     return entry.__dict__
