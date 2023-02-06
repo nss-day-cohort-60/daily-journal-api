@@ -3,9 +3,9 @@ import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import delete_entry, delete_entry_tag_with_entryid
-from views import get_all_moods
-from views import get_single_entry, get_all_entries
-from views import update_user, create_entry_tag
+from views import get_all_moods, get_single_mood
+from views import get_single_entry, get_all_entries, search_journal_entries, get_all_entry_tags
+from views import update_user, update_entry, create_entry_tag
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -48,6 +48,20 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
+            elif resource == "entry_tags":
+                self._set_headers(200)
+                response = get_all_entry_tags()
+            self.wfile.write(json.dumps(response).encode())
+        else:
+            (resource) = parsed
+            if resource == "entries_search":
+                if "q" in parsed[1]:
+                    search_term = parsed[1]["q"][0]
+                    self._set_headers(200)
+                    response = search_journal_entries(search_term)
+                else:
+                    self._set_headers(400)
+                    response = {"error": "missing search term"}
 
         self.wfile.write(json.dumps(response).encode())
 
