@@ -7,7 +7,7 @@ from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods, get_single_mood
 from views import get_single_entry, get_all_entries, search_journal_entries
-from views import update_user
+from views import update_user, update_entry
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -135,10 +135,14 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # success = False
+        ##
+        #
 
     # Delete a single animal from the list
         if resource == "users":
             update_user(id, post_body)
+        if resource == "entries":
+            update_entry(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
