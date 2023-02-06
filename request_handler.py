@@ -4,8 +4,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods, get_single_mood
-from views import get_single_entry, get_all_entries, search_journal_entries, get_all_entry_tags
-from views import update_user, update_entry, create_entry_tag
+from views import get_single_entry, get_all_entries, search_journal_entries
+from views import update_user, update_entry, create_entry_tag, get_all_entry_tags
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -39,7 +39,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 elif id is None:
                     self._set_headers(200)
                     response = get_all_moods()
-            if resource == "entries":
+            elif resource == "entries":
                 if id is not None and id < len(get_all_entries()):
                     self._set_headers(200)
                     response = get_single_entry(id)
@@ -103,9 +103,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods',
-                         'GET, POST, PUT, DELETE')
+                        'GET, POST, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers',
-                         'X-Requested-With, Content-Type, Accept')
+                        'X-Requested-With, Content-Type, Accept')
         self.end_headers()
 
     def do_DELETE(self):
@@ -135,10 +135,14 @@ class HandleRequests(BaseHTTPRequestHandler):
         (resource, id) = self.parse_url(self.path)
 
         # success = False
+        ##
+        #
 
     # Delete a single animal from the list
         if resource == "users":
             update_user(id, post_body)
+        if resource == "entries":
+            update_entry(id, post_body)
 
     # Encode the new animal and send in response
         self.wfile.write("".encode())
