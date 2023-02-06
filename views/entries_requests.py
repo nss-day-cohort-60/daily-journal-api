@@ -48,6 +48,7 @@ def get_all_entries():
             e.journal_entry,
             e.user_id,
             e.mood_id
+            
         FROM Entries e
         """)
 

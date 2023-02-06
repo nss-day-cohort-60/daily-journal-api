@@ -5,9 +5,15 @@ from urllib.parse import urlparse, parse_qs
 from views import create_tag, create_user
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
+<<<<<<< HEAD
+from views import get_all_moods
+from views import get_single_entry, get_all_entries, get_all_entry_tags
+from views import update_user
+=======
 from views import get_all_moods, get_single_mood
 from views import get_single_entry, get_all_entries, search_journal_entries
 from views import update_user, update_entry
+>>>>>>> main
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -50,6 +56,12 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
+<<<<<<< HEAD
+            if resource == "entry_tags":
+                self._set_headers(200)
+                response = get_all_entry_tags()
+            self.wfile.write(json.dumps(response).encode())
+=======
         else:
             (resource) = parsed
             if resource == "entries_search":
@@ -62,6 +74,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = {"error": "missing search term"}
 
         self.wfile.write(json.dumps(response).encode())
+>>>>>>> main
 
     def do_POST(self):
         """ posts new data to the database """
@@ -80,6 +93,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         elif resource == "tags":
             self._set_headers(201)
             new_data = create_tag(post_body)
+
         elif resource == "users":
             self._set_headers(201)
             new_data = create_user(post_body)
