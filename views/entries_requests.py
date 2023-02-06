@@ -2,24 +2,6 @@ import json
 import sqlite3
 from models import Entries
 
-def create_entry(new_entry):
-    """Returns new dictionary with id property added"""
-    with sqlite3.connect("./journal.sqlite3") as conn:
-        db_cursor = conn.cursor()
-
-        db_cursor.execute("""
-        INSERT INTO Entries
-            ( timestamp, concepts, journal_entry, user_id, mood_id)
-        VALUES
-            ( ?, ?, ?, ?, ?);
-        """, (new_entry['timestamp'], new_entry['concepts'], new_entry['journal_entry'], new_entry['user_id'], new_entry['mood_id']))
-
-        id = db_cursor.lastrowid
-
-        new_entry['id'] = id
-
-    return new_entry
-
 def delete_entry(id):
     """this is to delete individual entry using SQL"""
     with sqlite3.connect("./journal.sqlite3") as conn:
