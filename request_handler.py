@@ -53,7 +53,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                 response = get_all_entry_tags()
             self.wfile.write(json.dumps(response).encode())
         else:
-            (resource) = parsed
+            (resource, query) = parsed
             if resource == "entries_search":
                 if "q" in parsed[1]:
                     search_term = parsed[1]["q"][0]
@@ -63,7 +63,7 @@ class HandleRequests(BaseHTTPRequestHandler):
                     self._set_headers(400)
                     response = {"error": "missing search term"}
 
-        self.wfile.write(json.dumps(response).encode())
+            self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
         """ posts new data to the database """
