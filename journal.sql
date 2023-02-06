@@ -67,3 +67,21 @@ INSERT INTO `Entry_Tags` VALUES (null, 4, 4);
 INSERT INTO `Entry_Tags` VALUES (null, 5, 5);
 
 DROP TABLE Users 
+
+SELECT
+            e.id,
+            e.timestamp,
+            e.concepts,
+            e.journal_entry,
+            e.user_id,
+            e.mood_id,
+            et.id,
+            et.entry_id,
+            et.tag_id,
+            t.id,
+            t.subject
+        FROM Entry_tags et
+        JOIN entries e
+            ON e.id = et.entry_id
+        JOIN Tags t 
+            ON t.id = et.tag_id

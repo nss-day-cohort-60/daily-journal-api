@@ -6,7 +6,7 @@ from views import create_tag
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods
-from views import get_single_entry, get_all_entries
+from views import get_single_entry, get_all_entries, get_all_entry_tags
 from views import update_user
 
 class HandleRequests(BaseHTTPRequestHandler):
@@ -50,8 +50,10 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
-
-        self.wfile.write(json.dumps(response).encode())
+            if resource == "entry_tags":
+                self._set_headers(200)
+                response = get_all_entry_tags()
+            self.wfile.write(json.dumps(response).encode())
 
     def do_POST(self):
         """ posts new data to the database """
@@ -64,13 +66,14 @@ class HandleRequests(BaseHTTPRequestHandler):
 
         new_data = None
 
-        if resource == "entry":
+        if resource == "entries":
+            self._set_headers(201)
             new_data = create_entry(post_body)
         elif resource == "tags":
             self._set_headers(201)
             new_data = create_tag(post_body)
 
-        if resource != 'entry' or 'tags':
+        elif resource is not 'entries' or 'tags':
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())
