@@ -2,7 +2,7 @@ import json
 import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
-from views import create_tag
+from views import create_tag, create_user
 from views import create_entry
 from views import delete_entry, delete_entry_tag_with_entryid
 from views import get_all_moods, get_single_mood
@@ -80,6 +80,9 @@ class HandleRequests(BaseHTTPRequestHandler):
         elif resource == "tags":
             self._set_headers(201)
             new_data = create_tag(post_body)
+        elif resource == "users":
+            self._set_headers(201)
+            new_data = create_user(post_body)
         elif resource is not 'entries' or 'tags':
             self._set_headers(404)
 
