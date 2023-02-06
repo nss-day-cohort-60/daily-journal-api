@@ -98,6 +98,7 @@ def search_journal_entries(search_term):
             entries.append(entry.__dict__)
 
     return entries
+
 def update_entry(id, new_entry):
     """hi sydney<3"""
     with sqlite3.connect("./journal.sqlite3") as conn:
