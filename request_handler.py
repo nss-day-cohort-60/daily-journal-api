@@ -3,9 +3,9 @@ import sqlite3
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse, parse_qs
 from views import delete_entry, delete_entry_tag_with_entryid
-from views import get_all_moods, get_single_mood
+from views import get_all_moods, get_single_mood, get_entries_by_mood
 from views import get_single_entry, get_all_entries, search_journal_entries
-from views import update_user, update_entry, create_entry_tag, get_all_entry_tags
+from views import update_user, update_entry, create_entry_tag, get_all_entry_tags, get_single_tag, get_all_tags, create_user, get_single_user, get_all_users
 
 class HandleRequests(BaseHTTPRequestHandler):
     """Controls the functionality of any GET, PUT, POST, DELETE requests to the server
@@ -33,14 +33,14 @@ class HandleRequests(BaseHTTPRequestHandler):
             (resource, id) = parsed
 
             if resource == "moods":
-                if id is not None and id < len(get_all_moods()):
+                if id is not None:
                     self._set_headers(200)
                     response = get_single_mood(id)
                 elif id is None:
                     self._set_headers(200)
                     response = get_all_moods()
             elif resource == "entries":
-                if id is not None and id < len(get_all_entries()):
+                if id is not None:
                     self._set_headers(200)
                     response = get_single_entry(id)
                 elif id is None:
@@ -48,9 +48,28 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = get_all_entries()
                 else:
                     self._set_headers(404)
+            elif resource == "tags":
+                if id is not None:
+                    self._set_headers(200)
+                    response = get_single_tag(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_tags()
+                else:
+                    self._set_headers(404)
+            elif resource == "users":
+                if id is not None:
+                    self._set_headers(200)
+                    response = get_single_user(id)
+                elif id is None:
+                    self._set_headers(200)
+                    response = get_all_users()
+                else:
+                    self._set_headers(404)
             elif resource == "entry_tags":
                 self._set_headers(200)
                 response = get_all_entry_tags()
+
             self.wfile.write(json.dumps(response).encode())
         else:
             (resource, query) = parsed
@@ -62,6 +81,9 @@ class HandleRequests(BaseHTTPRequestHandler):
                 else:
                     self._set_headers(400)
                     response = {"error": "missing search term"}
+            elif resource == 'entries' and query.get('mood_id'):
+                self._set_headers(200)
+                response = get_entries_by_mood(query['mood_id'][0])
 
             self.wfile.write(json.dumps(response).encode())
 
@@ -79,8 +101,11 @@ class HandleRequests(BaseHTTPRequestHandler):
         if resource == "entry_tag":
             self._set_headers(201)
             new_data = create_entry_tag(post_body)
+        elif resource == "user":
+            self._set_headers(201)
+            new_data = create_user(post_body)
 
-        if resource is not "entry_tag":
+        elif resource is not "entry_tag" or "user":
             self._set_headers(404)
 
             self.wfile.write(json.dumps(new_data).encode())
@@ -133,10 +158,6 @@ class HandleRequests(BaseHTTPRequestHandler):
 
     # Parse the URL
         (resource, id) = self.parse_url(self.path)
-
-        # success = False
-        ##
-        #
 
     # Delete a single animal from the list
         if resource == "users":
