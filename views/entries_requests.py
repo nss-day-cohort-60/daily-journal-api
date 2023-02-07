@@ -125,3 +125,43 @@ def update_entry(id, new_entry):
     else:
         # Forces 204 response by main module
         return True
+
+def get_entries_by_mood (mood_id):
+    """docstring"""
+    # Open a connection to the database
+    with sqlite3.connect("./journal.sqlite3") as conn:
+
+        # Just use these. It's a Black Box.
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        # Write the SQL query to get the information you want
+        db_cursor.execute("""
+        SELECT
+            e.id,
+            e.timestamp,
+            e.concepts,
+            e.journal_entry,
+            e.user_id,
+            e.mood_id
+        FROM Entries e
+        WHERE e.mood_id=?
+        """, ( mood_id, ))
+
+        # Initialize an empty list to hold all animal representations
+        entries = []
+
+        # Convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        # Iterate list of data returned from database
+        for row in dataset:
+
+    # Create an animal instance from the current row
+            entry = Entries(row['id'], row['timestamp'],
+            row['concepts'], row['journal_entry'], row['user_id'],
+            row['mood_id'])
+
+            entries.append(entry.__dict__)
+
+    return entries
